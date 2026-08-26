@@ -1,0 +1,9 @@
+## Interface: 120100, 50504, 40402, 30405, 20506, 11509
+## Title: DBM Alert Customizer
+## Notes: Customize the color, message text, and sound of any individual DBM Announce or Special Warning. Works on Classic Era, TBC, Wrath, Cata, MoP, and Retail.
+## Author: Strickland
+## Version: 1.3
+## Dependencies: DBM-Core
+## SavedVariables: DBMAbilityColorsDB
+
+AlertCustomizer.lua
