@@ -287,19 +287,11 @@ local function HookWarningObject(mod, obj, isSpecialWarning)
 		return r1, r2, r3
 	end
 
-	-- DBM voice-pack spoken alerts (recorded ability call-outs) are NOT played from
-	-- inside Show(). They're played from a separate "Play" method on special warning
-	-- objects, either called directly or scheduled for a few tenths of a second later
-	-- (so the beep and the voice line don't overlap). Because that happens outside of
-	-- Show()'s pcall window, muting DBM.PlaySoundFile only during Show() never catches
-	-- it. Hook Play() too so "hide DBM sound" also hides DBM's own spoken alert.
 	if isSpecialWarning and type(obj.Play) == "function" then
 		local origPlay = obj.Play
 		obj.Play = function(self, ...)
 			local entry = GetEntry(GetModKey(mod), self.option, false)
 			if entry and entry.hideDefaultSound then
-				-- Swallow DBM's own voice line entirely; our custom sound/TTS already
-				-- played from the Show() hook above.
 				return
 			end
 			return origPlay(self, ...)
