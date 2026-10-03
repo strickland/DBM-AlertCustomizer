@@ -1,3 +1,11 @@
+# NEW FEATURE 4th of Oct.
+Switch any announcement type to special announcement of any style that you like, or switch special announcement to normal announcement.
+
+The way it works is that you could choose for any ability to switch it from normal announcement to special announcement which will make the text bigger, not only that but you can choose from any special announcement style that you like (This will follow DBM's special announcement options) - thus making it not only bigger, but can choose any flash type that you like.
+
+Now with this mod DBM is actually pretty much 100% customizable, for the people who keep saying that they like BigWigs cause its customizable. I feel now with this DBM is more so customizable than BigWigs :P
+
+
 # DBM-AlertCustomizer
 Tweak with the announcements, and special announcements in (Color, Msg, Sounds).
 
