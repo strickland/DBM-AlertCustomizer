@@ -1,8 +1,8 @@
-## Interface: 11509, 16001, 20506, 30405, 38002, 40402, 50504, 120100
+## Interface: 11509, 16001, 20506, 30405, 38002, 40402, 50504, 120105
 ## Title: DBM Alert Customizer
 ## Notes: Customize the color, message text, sound and display type (normal or special) of any individual DBM Announce or Special Warning. Works on Classic Era, Forever, TBC, Wrath, Titan Reforged, Cata, MoP, and Retail.
 ## Author: Strickland
-## Version: 1.5.1
+## Version: 1.5.2
 ## Dependencies: DBM-Core
 ## SavedVariables: DBMAbilityColorsDB
 
