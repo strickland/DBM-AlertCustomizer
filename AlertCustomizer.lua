@@ -53,7 +53,9 @@ local function GetInstanceName(instanceId)
 	elseif EJ_GetInstanceInfo then
 		name = EJ_GetInstanceInfo(instanceId)
 	end
-	name = name or ("Instance " .. tostring(instanceId))
+	if type(name) ~= "string" or name == "" then
+		name = "Instance " .. tostring(instanceId)
+	end
 	instanceNameCache[instanceId] = name
 	return name
 end
@@ -273,11 +275,15 @@ local function SpeakText(text)
 		return
 	end
 	local voiceID = 0
-	if C_TTSSettings and C_TTSSettings.GetVoiceOptionID and Enum.TtsVoiceType then
-		local ok, id = pcall(C_TTSSettings.GetVoiceOptionID, Enum.TtsVoiceType.Narration)
+	-- Enum.TtsVoiceType only has Standard (0) and Alternate (1); there is no "Narration".
+	if C_TTSSettings and C_TTSSettings.GetVoiceOptionID and Enum.TtsVoiceType and Enum.TtsVoiceType.Standard then
+		local ok, id = pcall(C_TTSSettings.GetVoiceOptionID, Enum.TtsVoiceType.Standard)
 		if ok and id then voiceID = id end
 	end
-	if Enum.VoiceTtsDestination then
+	-- Patch 12.0.0 removed the destination argument: SpeakText(voiceID, text, rate, volume, overlap).
+	-- Don't trust the enum alone for this, it can outlive the argument it was made for.
+	local isModernRetail = (select(4, GetBuildInfo()) or 0) >= 120000
+	if Enum.VoiceTtsDestination and not isModernRetail then
 		C_VoiceChat.SpeakText(voiceID, text, Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
 	else
 		C_VoiceChat.SpeakText(voiceID, text, 0, 100, false)
@@ -417,13 +423,16 @@ end
 -- Sounds follow DBM's own decision: the other type's sound only plays if DBM wanted to
 -- play a sound for this warning, so DBM's mute/voice pack settings keep working.
 
-local promoteState = { shown = false, soundWanted = false }
+local promoteState = { shown = false, soundWanted = false, color = nil }
 local demoteState = { shown = false, soundWanted = false, color = nil }
 local promoteNextPlaySoundFile
 
 -- Normal announce -> drawn in the special warning frame
 local function PromoteAddWarning(self, text, force, announceObject, useSound, prefix, overrideDuration, customIcon)
 	promoteState.shown = true
+	-- The special warning frame ignores the announce's color table, so hand the custom
+	-- color to the AddSpecialWarning hook, which puts it inside the text instead.
+	pendingSWColor = promoteState.color
 	return self:AddSpecialWarning(text, nil, nil, nil, customIcon, true)
 end
 
@@ -528,6 +537,7 @@ local function HookWarningObject(mod, obj, isSpecialWarning)
 		local savedAddWarning, savedAddSW, savedPSF, savedSWSound, savedFlashShow, savedVibrate
 		if promote then
 			promoteState.shown, promoteState.soundWanted = false, false
+			promoteState.color = entry.color
 			savedAddWarning = DBM.AddWarning
 			DBM.AddWarning = PromoteAddWarning
 			savedPSF = DBM.PlaySoundFile
@@ -562,6 +572,7 @@ local function HookWarningObject(mod, obj, isSpecialWarning)
 		if promote then
 			DBM.PlaySoundFile = savedPSF
 			DBM.AddWarning = savedAddWarning
+			promoteState.color = nil
 		elseif demote then
 			DBM.VibrateController = savedVibrate
 			if DBM.Flash then DBM.Flash.Show = savedFlashShow end
